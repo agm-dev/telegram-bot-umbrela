@@ -1,0 +1,20 @@
+{
+  "name": "Umbrela",
+  "version": "0.0.0",
+  "description": "Bot for telegram warnings about weather",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "agm-dev",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "~3.4.6",
+    "express": "~4.14.0",
+    "mongoose": "~4.6.8",
+    "telebot": "^1.0.6"
+  },
+  "devDependencies": {
+    "babel-cli": "~6.18.0"
+  }
+}
