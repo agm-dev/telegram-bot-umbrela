@@ -146,6 +146,34 @@ bot.on('/subscribe', msg => {
 
 });
 
+bot.on('/unsubscribe', msg => {
+
+    let parse = 'html';
+    if (msg.text === '/unsubscribe') return bot.sendMessage(msg.chat.id, 'Puedo eliminar todas tus suscripciones de alertas de tiempo si me escribes el mensaje <i>/unsubscribe all</i>', { parse });
+
+    if (msg.text === '/unsubscribe all') {
+        // Is there subscriptions?
+        Subscription.find({ 'subscribers._id': msg.chat.id }).exec( (err, results) => {
+            if (err) return console.log('Cannot perform a find query on database');
+            if (results.length <= 0) return bot.sendMessage(msg.chat.id, 'No tienes ninguna suscripción');
+
+            // We find all that guy subscriptions and remove them:
+            // db.subscriptions.update({},{$pull: {subscribers: { _id: msg.chat.id } } },{multi:true});
+            Subscription.update(
+                {},
+                { '$pull': { subscribers: { _id: msg.chat.id } } },
+                { multi: true },
+                (err) => {
+                    if (err) return bot.sendMessage(msg.chat.id, 'Mmm, no me ha sido posible eliminar tus suscripciones ahora mismo :/ Vuelve a intentarlo más tarde o ponte en contacto con @adriangm');
+                    console.log('Subscriptions of chat ' + msg.chat.id + ' has been removed');
+                    return bot.sendMessage(msg.chat.id, 'Todas tus suscripciones han sido eliminadas. No te molestaré con más mensajes :3');
+                }
+            );
+        });
+    }
+    
+});
+
 bot.on('text', msg => {
     let id = msg.from.id;
     let text = msg.text;
