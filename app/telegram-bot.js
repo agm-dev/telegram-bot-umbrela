@@ -36,33 +36,96 @@ bot.on('/subscribe', msg => {
     let cities = msg.text.replace(/^\/subscribe/gi, '').split(',');
     console.log(cities);
 
+    // Send instructions to confirm subscription:
+    if (cities.length > 0 && Number.isNaN( parseInt( cities[0] )) ) {
+        bot.sendMessage(
+            msg.chat.id,
+            'Escribe <i>/subscribe</i> seguido de un espacio y el número identificador de la ciudad a la que quieres suscribirte para confirmar la suscripción. Puedes escribir varias a la vez separadas por comas.',
+            { parse }
+        );
+    }
+
     for (let city of cities) {
         // Look for them on cities collection:
         city = city.trim();
         if (city.length <= 0) continue;
         console.log(city);
 
+        // /SUBSCRIBE ID
         // If user writes a city ID:
         if (!Number.isNaN( parseInt( city ) )) {
             City.findOne({
                 _id: city
             }).
-            select({ name: 1, country: 1}).
+            select({ _id: 1, name: 1, country: 1}).
             exec( (err, city) => {
                 console.log(city);
                 if (err) return bot.sendMessage(msg.chat.id, 'Uy... Parece que ha habido algún error al intentar suscribirte :( Habla con @adriangm si el problema persiste.');
                 if (!city) return bot.sendMessage(msg.chat.id, 'Has indicado un ID de ciudad que no se corresponde con ninguna ciudad de la base de datos. Es posible que te hayas equivocado al introducir el número de ID.');
-                // TODO: ya hemos comprobado que el ID de ciudad existe, así que
-                /* ahora queda cargar el modelo de suscripción y crear una nueva
-                * suscripción con los datos del tipo y la ciudad suscrita.
-                * creo que lo suyo es modificar el esquema de suscripciones para que
-                * el documento indique id de ciudad, y para esa ciudad un array
-                * con los datos de todos los suscriptores de dicha ciudad.
-                */
+                Subscription.findOne({
+                    _id: city._id
+                }).
+                select({ _id: 1, name: 1, country: 1}).
+                exec( (err, cityData) => {
+                    if (err) return false;
+                    if (!cityData) {
+                        // Then add new whole subscription:
+                        let subscriptionData = {
+                            _id: city._id,
+                            name: city.name,
+                            country: city.country,
+                            subscribers: [{
+                                _id: msg.chat.id,
+                                chatType: msg.chat.type,
+                                username: msg.chat.username,
+                                firstName: msg.chat.first_name,
+                                lastName: msg.chat.last_name,
+                            }],
+                        };
+                        console.log(subscriptionData);
+                        let subscription = new Subscription(subscriptionData);
+                        subscription.save( (err) => {
+                            if (err) return console.log('Cannot save subscription into database');
+                            console.log('New subscription was added to database');
+                            return bot.sendMessage(msg.chat.id, 'Te has suscrito con éxito a las alertas de ' + city.name + ', ' + city.country);
+                        });
+                    } else {
+                        // Then find id subscriptor into nested array:
+                        Subscription.findOne({
+                            _id: city._id,
+                            'subscribers._id': msg.chat.id
+                        }).exec( (err, subscriberData) => {
+                            if (err) return false;
+                            if (subscriberData) {
+                                // If there is data, then subscription already exists:
+                                console.log('That subscription already exists');
+                                return bot.sendMessage(msg.chat.id, 'Ya hemos registrado una suscripción para las alertas de '+ cityData.name + ', ' + cityData.country);
+                            } else {
+                                // If there is no data, then push data to subscribers array:
+                                console.log('City document exists, but this person is not a suscriber. Updating document...');
+                                let subscriber = {
+                                    _id: msg.chat.id,
+                                    chatType: msg.chat.type,
+                                    username: msg.chat.username,
+                                    firstName: msg.chat.first_name,
+                                    lastName: msg.chat.last_name,
+                                };
+                                Subscription.update(
+                                    { _id: city._id },
+                                    { $push: { subscribers: subscriber } }
+                                ).exec( (err) => {
+                                    if (err) return console.log('Cannot update the array of subscribers');
+                                    console.log('Document updated. New subscriber was added');
+                                    return bot.sendMessage(msg.chat.id, 'Te has suscrito con éxito a las alertas de ' + city.name + ', ' + city.country);
+                                });
+                            }
+                        });
+                    }
+                });
             });
-            return;
         }
 
+        // /SUBSCRIBE NAME
         // Else, user is writing a city name:
         let re = new RegExp('^' + city + '.*', 'gi');
         console.log(re);
@@ -75,15 +138,9 @@ bot.on('/subscribe', msg => {
             if (err) return bot.sendMessage(msg.chat.id, 'Uy... Parece que ha habido algún error al intentar suscribirte :( Habla con @adriangm si el problema persiste.');
             console.log(cityArr);
             if (city.length < 1) return bot.sendMessage(msg.chat.id, 'Las alertas en esa ciudad no están disponibles, sorry :/');
-            bot.sendMessage(
-                msg.chat.id,
-                'Escribe <i>/subscribe</i> seguido de un espacio y el número identificador de la ciudad a la que quieres suscribirte para confirmar la suscripción. Puedes escribir varias a la vez separadas por comas.',
-                { parse }
-            ).then( () => {
-                for (let item of cityArr) {
-                    bot.sendMessage(msg.chat.id, item._id + ' - ' + item.name + ', ' + item.country);
-                }
-            });
+            for (let item of cityArr) {
+                bot.sendMessage(msg.chat.id, item._id + ' - ' + item.name + ', ' + item.country);
+            }
         });
     }
 
