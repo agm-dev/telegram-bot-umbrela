@@ -1,19 +1,14 @@
 'use strict';
 // Schema for subscriptions:
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const subscriptorSchema = require('./subscriptor.js');
 
 const subscriptionSchema = new Schema({
-    chatId: Number,
-    chatType: String,
-    chatTitle: String,
-    username: String,
-    firstName: String,
-    lastName: String,
-    locations: [{
-        id: Number,
-        name: String
-    }],
+    _id: Number,
+    name: String,
+    country: String,
+    subscribers: [ subscriptorSchema ],
     updated: { type: Date, default: Date.now }
 });
 
