@@ -3,12 +3,13 @@
 
 // Requires:
 const Telebot = require('telebot');
+const apiKey = require('./keys/umbrela-telegram-key.js');
 const mongoose = require('mongoose');
 const City = require('./cities.js');
 const Subscription = require('./subscriptions.js');
 
 const bot = new Telebot({
-    token: '297491356:AAGuY2UNpyEApp5x7CwZEimRhu6UZSkTu8A',
+    token: apiKey,
     polling: {
         interval: 1000,
         timeout: 0,
@@ -171,7 +172,7 @@ bot.on('/unsubscribe', msg => {
             );
         });
     }
-    
+
 });
 
 bot.on('text', msg => {
