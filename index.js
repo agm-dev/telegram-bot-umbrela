@@ -4,6 +4,7 @@ const db = require('./app/db.js');
 //const webServer = require('./app/server.js');
 const umbrela = require('./app/umbrela.js');
 const bot = require('./app/telegram-bot.js');
+const weather = require('./app/weather.js');
 
 // Main thread:
 
