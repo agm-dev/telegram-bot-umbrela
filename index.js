@@ -9,7 +9,11 @@ const weather = require('./app/weather.js');
 // Main thread:
 
 // Init interval to look for weather in time:
-//setInterval(umbrela.checkWeather, 1000 * 60 * 10); // Executes every 10 minutes.
+console.log('Debug: Set interval for current weather');
+setInterval( () => {
+    console.log('Debug: Interval for current weather execution');
+    weather.currentWeatherAlert();
+}, 1000 * 60 * 10); // Executes every 10 minutes.
 
 // Init interval to look for weather forecast:
 //setInterval(weatherForecast, 1000 * 60 * 60 * 3); // Executes every 3 hours.
@@ -21,4 +25,5 @@ webServer.listen(port, function(){
     console.log("Umbrela's web server is listening on port "+ port);
 });
 */
+console.log('Debug: connecting bot...');
 bot.connect();
