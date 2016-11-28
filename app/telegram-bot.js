@@ -178,7 +178,7 @@ bot.on('/unsubscribe', msg => {
 bot.on('text', msg => {
     let id = msg.from.id;
     let text = msg.text;
-    return bot.sendMessage(id, 'You said: ' + text);
+    return bot.sendMessage(id, 'Has escrito: ' + text);
 });
 
 bot.on('connect', () => {
