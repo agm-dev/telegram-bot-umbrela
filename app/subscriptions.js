@@ -8,6 +8,7 @@ const subscriptionSchema = new Schema({
     _id: Number,
     name: String,
     country: String,
+    rain: { type: Boolean, default: false },
     subscribers: [ subscriptorSchema ],
     updated: { type: Date, default: Date.now }
 });
