@@ -1,6 +1,6 @@
 {
   "name": "Umbrela",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Bot for telegram warnings about weather",
   "main": "index.js",
   "scripts": {
@@ -9,12 +9,7 @@
   "author": "agm-dev",
   "license": "MIT",
   "dependencies": {
-    "bluebird": "~3.4.6",
-    "express": "~4.14.0",
     "mongoose": "~4.6.8",
     "telebot": "^1.0.6"
-  },
-  "devDependencies": {
-    "babel-cli": "~6.18.0"
   }
 }
