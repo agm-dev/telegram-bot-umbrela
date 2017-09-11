@@ -15,3 +15,7 @@ module.exports = apiKey;
 ```
 
 Ideally all these enviroment variables should be declared using dotenv npm package, but who knew about this 10 months ago...
+
+# Example:
+
+[@umbrelaBot](https://telegram.me/umbrelaBot) is a running implementation of this code.
